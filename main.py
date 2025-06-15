@@ -1,0 +1,112 @@
+from typing import Any
+import telebot
+from ai import Assistant
+from Database import Database
+from datetime import datetime
+
+TOKEN=""
+
+bot = telebot.TeleBot(TOKEN)
+
+db = Database()
+
+def insertData(name: str, table: int, persons: int, data: str) -> Exception | str:
+    """Insert a new reserve, PLEASE ANALYSE THE DATABASE TO VERIFY IF THE TABLE IS COMPATIBLE WITH DATA (TIME).
+        Args:
+            name (str): The name of main person for reserve.
+            table (int): The number of table to reserve (0-30).
+            persons (int): Number of persons to reserve.
+            data (str): The data of reserve in (year-month-day hour-minute-second).
+
+        Returns (str): True success False or message Exception Error
+    """
+
+    try:
+        db.insertData((name, table, persons, datetime.strptime(data, "%Y-%m-%d %H:%M:%S")))
+        return "True"
+    except Exception as e:
+        return str(e)
+
+
+def deleteData(id: int) -> Exception | str:
+    """Delete a reserve, use Fetch to find the id of row to delete.
+            Args:
+                id (int): The id of reserve to remove.
+
+            Returns (str): True success False or message Exception Error
+        """
+    try:
+        db.deleteData(id)
+        return "True"
+    except Exception as e:
+        return str(e)
+
+def changeDate(id: int, date: str) -> Exception | str:
+    """Change the date a reserve, use Fetch to find the id of row to change.
+                Args:
+                    id (int): The id of reserve to change.
+                    date (str): The data of reserve.
+
+                Returns (str): True success False or message Exception Error
+            """
+    try:
+        db.changeDate(id, datetime.strptime(date, "%Y-%m-%d %H:%M:%S"))
+        return "True"
+    except Exception as e:
+        return str(e)
+
+
+def fetchRowUser(name: str, date: str) -> Exception | Any:
+    """Fetch the reserve's.
+                Args:
+                    name (str): The name of reserve.
+                    date (str): the data of reserve.
+
+                Returns (str): SQL DATA or message Exception Error
+            """
+    try:
+        return db.fetchRowUser(name, datetime.strptime(date, "%Y-%m-%d %H:%M:%S"))
+    except Exception as e:
+        return str(e)
+
+
+def fetchRowTable(table: int, date: str) -> Exception | Any:
+    """Fetch the reserve's.
+                    Args:
+                        table (int): The table of reserve.
+                        date (str): the data of reserve.
+
+                    Returns (str): SQL DATA or message Exception Error
+                """
+    try:
+        return db.fetchRowUser(table, datetime.strptime(date, "%Y-%m-%d %H:%M:%S"))
+    except Exception as e:
+        return str(e)
+
+def fetchAvalaibleTable(date: str) -> Exception | Any:
+    """Fetch the reserve's.
+                    Args:
+                        date (str): the data of reserve.
+
+                    Returns (str): SQL DATA or message Exception Error
+                """
+    try:
+        return db.fetchAvalaibleTable(datetime.strptime(date, "%Y-%m-%d %H:%M:%S"))
+    except Exception as e:
+        return str(e)
+
+maria = Assistant()
+maria.addAllTool([insertData, deleteData, changeDate, fetchRowTable, fetchRowUser, fetchAvalaibleTable])
+
+@bot.message_handler(func=lambda msg: True)
+def echo_all(message):
+    user_input = message.text
+
+    # 2. Envia o texto para o assistente
+    assistant_response = maria.sendRequest(user_input)  # Isso deve retornar uma string
+
+    # 3. Responde usando o objeto original da mensagem
+    bot.reply_to(message, assistant_response)  # Envia diretamente a string
+
+
+bot.infinity_polling()
