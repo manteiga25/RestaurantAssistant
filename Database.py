@@ -27,5 +27,5 @@ class Database:
     def fetchRowTable(self, table, date):
         return self.cursor.execute("SELECT * FROM reservas WHERE mesa = ? AND data = ?", (table, date)).fetchone()
 
-    def fetchAvalaibleTable(self, date):
-        return 31-self.cursor.execute("SELECT COUNT(mesa) from reservas WHERE data = ?", (date,)).fetchone()[0]
+    def fetchAvalaibleTable(self, dateInit, dateEnd):
+        return 31-self.cursor.execute("SELECT COUNT(mesa) from reservas WHERE data BETWEEN ? AND ?", (dateInit, dateEnd)).fetchone()[0]

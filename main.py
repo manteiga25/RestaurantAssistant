@@ -41,16 +41,16 @@ def deleteData(id: int) -> Exception | str:
     except Exception as e:
         return str(e)
 
-def changeDate(id: int, date: str) -> Exception | str:
+def changeDate(id: int, data: str) -> Exception | str:
     """Change the date a reserve, use Fetch to find the id of row to change.
                 Args:
                     id (int): The id of reserve to change.
-                    date (str): The data of reserve.
+                    data (str): The data of reserve in (year-month-day hour-minute-second).
 
                 Returns (str): True success False or message Exception Error
             """
     try:
-        db.changeDate(id, datetime.strptime(date, "%Y-%m-%d %H:%M:%S"))
+        db.changeDate(id, datetime.strptime(data, "%Y-%m-%d %H:%M:%S"))
         return "True"
     except Exception as e:
         return str(e)
@@ -83,15 +83,16 @@ def fetchRowTable(table: int, date: str) -> Exception | Any:
     except Exception as e:
         return str(e)
 
-def fetchAvalaibleTable(date: str) -> Exception | Any:
+def fetchAvalaibleTable(dateInit: str, dateEnd: str) -> Exception | Any:
     """Fetch the reserve's.
                     Args:
-                        date (str): the data of reserve.
+                        dateInit (str): The data of reserve - 3hour.
+                        dateEnd (str): The data of reserve + 3hour.
 
                     Returns (str): SQL DATA or message Exception Error
                 """
     try:
-        return db.fetchAvalaibleTable(datetime.strptime(date, "%Y-%m-%d %H:%M:%S"))
+        return db.fetchAvalaibleTable(datetime.strptime(dateInit, "%Y-%m-%d %H:%M:%S"), datetime.strptime(dateEnd, "%Y-%m-%d %H:%M:%S"))
     except Exception as e:
         return str(e)
 
