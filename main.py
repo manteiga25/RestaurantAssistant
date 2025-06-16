@@ -3,6 +3,17 @@ import telebot
 from ai import Assistant
 from Database import Database
 from datetime import datetime
+import JsonContext
+from os.path import isfile, isdir
+from os import close, mkdir
+
+# unused files
+close(0)
+close(1)
+close(2)
+
+if not isdir("context"):
+    mkdir("context")
 
 TOKEN=""
 
@@ -101,13 +112,22 @@ maria.addAllTool([insertData, deleteData, changeDate, fetchRowTable, fetchRowUse
 
 @bot.message_handler(func=lambda msg: True)
 def echo_all(message):
+    user_id = message.from_user.id
     user_input = message.text
 
+    if not maria.user_exists(user_id):
+        if isfile(f"context/{user_id}.json"):
+            maria.putHistory(user_id, JsonContext.openHistory(user_id)[0])
+        else:
+            JsonContext.createHistory(user_id)
+
     # 2. Envia o texto para o assistente
-    assistant_response = maria.sendRequest(user_input)  # Isso deve retornar uma string
+    assistant_response = maria.sendRequest(user_id, user_input)  # Isso deve retornar uma string
 
     # 3. Responde usando o objeto original da mensagem
     bot.reply_to(message, assistant_response)  # Envia diretamente a string
+
+    JsonContext.putHistory(user_id, user_input, assistant_response)
 
 
 bot.infinity_polling()
