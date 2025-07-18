@@ -21,4 +21,5 @@ def putHistory(id, prompt, result):
         dump(AllData, file, indent=4)
 
 def createHistory(id):
-    _ = open(f"context/{id}.json", 'w')
+    with open(f"context/{id}.json", 'w'):
+        pass

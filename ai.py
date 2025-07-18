@@ -20,12 +20,14 @@ class Assistant:
         )
 
     def __init__(self):
-        self.client = genai.Client(api_key="AIzaSyA2OOhuUGZiJe3NQTjQLMXqNur3yLcOf0g")
+        self.client = genai.Client(api_key="")
 
     def user_exists(self, id):
         return True if self.conversation_history.get(id) is not None else False
 
     def putHistory(self, id, data):
+        if len(self.conversation_history) == 50:
+            self.conversation_history.pop(next(iter(self.conversation_history)))
         for user, model in zip(data["user"], data["model"]):
             self.add_user_message(id, user)
             self.add_model_message(id, model)
@@ -44,12 +46,12 @@ class Assistant:
         self.add_user_message(id, prompt)
         try:
             self.response = self.client.models.generate_content(
-                model="gemini-2.0-flash",
+                model="gemini-2.5-flash",
                 contents=self.conversation_history[id],
                 config=self.config
             )
-            self.add_model_message(id, self.response.text)
-            return self.response.text
+            self.add_model_message(id, self.response.candidates[0].content.parts[0].text)
+            return self.response.candidates[0].content.parts[0].text
         except Exception as e:
             error_msg = f"Erro: {str(e)}"
             self.add_model_message(id, error_msg)
