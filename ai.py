@@ -1,7 +1,9 @@
+from collections import defaultdict
+
 from google import genai
 from google.genai import types
 from google.genai.types import Content, Part
-from collections import defaultdict
+
 
 class Assistant:
 
@@ -28,9 +30,10 @@ class Assistant:
     def putHistory(self, id, data):
         if len(self.conversation_history) == 50:
             self.conversation_history.pop(next(iter(self.conversation_history)))
-        for user, model in zip(data["user"], data["model"]):
-            self.add_user_message(id, user)
-            self.add_model_message(id, model)
+        for message in data:
+            for user, model in zip(message["user"], message["model"]):
+                self.add_user_message(id, user)
+                self.add_model_message(id, model)
 
     def add_user_message(self, user_id, text):
         self.conversation_history[user_id].append(

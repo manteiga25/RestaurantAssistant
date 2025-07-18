@@ -1,4 +1,4 @@
-import sqlite3
+from sqlite3 import connect
 
 class Database:
 
@@ -6,7 +6,7 @@ class Database:
     cursor = None
 
     def __init__(self):
-        self.database = sqlite3.connect("reservas.db", check_same_thread=False)
+        self.database = connect("reservas.db", check_same_thread=False)
         self.cursor = self.database.cursor()
 
     def insertData(self, row):
@@ -14,7 +14,7 @@ class Database:
         self.database.commit()
 
     def deleteData(self, id):
-        self.cursor.execute("DELETE FROM reservas where id = " + id)
+        self.cursor.execute("DELETE FROM reservas where id = ?", (id, ))
         self.database.commit()
 
     def changeDate(self, id, date):

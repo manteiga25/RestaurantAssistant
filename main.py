@@ -1,11 +1,13 @@
-from typing import Any
-import telebot
-from ai import Assistant
-from Database import Database
 from datetime import datetime
-import JsonContext
-from os.path import isfile, isdir
 from os import close, mkdir
+from os.path import isfile, isdir
+from typing import Any
+
+import telebot
+
+import JsonContext
+from Database import Database
+from ai import Assistant
 
 # unused files
 close(0)
@@ -117,7 +119,7 @@ def echo_all(message):
 
     if not maria.user_exists(user_id):
         if isfile(f"context/{user_id}.json"):
-            maria.putHistory(user_id, JsonContext.openHistory(user_id)[0])
+            maria.putHistory(user_id, JsonContext.openHistory(user_id))
         else:
             JsonContext.createHistory(user_id)
 
